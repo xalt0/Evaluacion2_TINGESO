@@ -19,12 +19,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public List<UserEntity> getAllUsers() {
         return userService.getUsers();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
@@ -38,20 +38,19 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public UserEntity createUser(@RequestBody UserEntity user) {
         return userService.saveUser(user);
     }
 
-    @PutMapping
+    @PutMapping("/update")
     public UserEntity updateUser(@RequestBody UserEntity user) {
         return userService.updateUser(user);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         boolean deleted = userService.deleteUser(id);
         return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }
-

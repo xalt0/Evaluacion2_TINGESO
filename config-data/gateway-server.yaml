@@ -22,6 +22,10 @@ spring:
             allowedHeaders: "*"
       routes:
         - id: ms-user
-          uri: lb://ms-user:8090
+          uri: lb://ms-user
           predicates:
             - Path=/users/**
+        - id: ms-kart
+          uri: lb://ms-kart
+          predicates:
+            - Path=/karts/**
