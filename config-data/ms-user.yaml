@@ -1,10 +1,12 @@
 server:
-  port: ${SERVER_PORT}
+  port: ${SERVER_PORT:8081}  # Valor por defecto: 8081
+
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DBNAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DBNAME:ms_user_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
 eureka:
   instance:
     preferIpAddress: true

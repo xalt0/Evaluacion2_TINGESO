@@ -6,10 +6,10 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 
 @SpringBootApplication
 @EnableConfigServer
-public class ServiceDiscoveryApplication {
+public class MsConfigApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ServiceDiscoveryApplication.class, args);
+		SpringApplication.run(MsConfigApplication.class, args);
 	}
 
 }
