@@ -30,9 +30,10 @@ public class KartController {
 
     //getKarts
     @GetMapping("/get/{id}")
-    public ResponseEntity<KartEntity> getKartById(@PathVariable Long id) {
-        KartEntity kart = kartService.getKartById(id);
-        return ResponseEntity.ok(kart);
+    public ResponseEntity<KartEntity> getUserById(@PathVariable Long id) {
+        return kartService.getKartById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     //saveKart

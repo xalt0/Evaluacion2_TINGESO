@@ -73,7 +73,7 @@ public class ReserveService {
     public void validateExistence(List<Long> userIds, List<Long> kartIds) {
         for (Long userId : userIds) {
             try {
-                userClient.getUserById(userId); // si no existe, puede lanzar FeignException 404
+                userClient.getUserById(userId);
             } catch (FeignException.NotFound e) {
                 throw new IllegalArgumentException("User ID no existe: " + userId);
             }
