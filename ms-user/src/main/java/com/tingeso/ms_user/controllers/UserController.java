@@ -48,6 +48,12 @@ public class UserController {
         return userService.updateUser(user);
     }
 
+    @PutMapping("/{id}/add-fidelity")
+    public ResponseEntity<Void> addFidelity(@PathVariable Long id) {
+        boolean updated = userService.addFidelity(id);
+        return updated ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         boolean deleted = userService.deleteUser(id);

@@ -29,3 +29,7 @@ spring:
           uri: lb://ms-kart
           predicates:
             - Path=/karts/**
+        - id: ms-reserves
+          uri: lb://ms-reserves
+          predicates:
+            - Path=/reserves/**
