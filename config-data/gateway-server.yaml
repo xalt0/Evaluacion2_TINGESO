@@ -37,3 +37,7 @@ spring:
           uri: lb://ms-1
           predicates:
             - Path=/plans/**
+        - id: ms-2
+          uri: lb://ms-2
+          predicates:
+            - Path=/plans/**
