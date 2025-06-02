@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import feign.FeignException;
 
 @Service
@@ -31,6 +35,8 @@ public class ReserveService {
     @Autowired
     private FidelityDiscountClient fidelityDiscountClient;
 
+    private static final Logger logger = LoggerFactory.getLogger(ReserveService.class);
+
     // Listar reservas
     public List<ReserveEntity> getAllReserves() {
         return reserveRepository.findAll();
@@ -43,36 +49,42 @@ public class ReserveService {
 
     // Guardar una nueva reserva
     public ReserveEntity saveReserve(ReserveEntity reserve) {
+        logger.info("Guardando nueva reserva con usuarios: {}", reserve.getUserIds());
+
         // Calcular endTime si corresponde
         if (reserve.getStartTime() != null && reserve.getTotalTime() > 0) {
             reserve.setEndTime(reserve.getStartTime().plusMinutes(reserve.getTotalTime()));
+            logger.debug("EndTime calculado: {}", reserve.getEndTime());
         }
 
-        // Obtener descuentos aplicables
+        // Obtener descuento grupal
         int groupSize = reserve.getUserIds().size();
         int groupDiscount = 0;
         try {
             groupDiscount = groupDiscountClient.getBestDiscount(groupSize);
+            logger.info("Descuento grupal para {} personas: {}%", groupSize, groupDiscount);
         } catch (Exception e) {
-            // Log o fallback
+            logger.warn("No se pudo obtener descuento grupal. Usando 0%. Detalle: {}", e.getMessage());
         }
 
-        // Si quieres guardar el fee individual por usuario
         Map<Long, Double> userFees = new HashMap<>();
 
         for (Long userId : reserve.getUserIds()) {
             int fidelityPoints = 0;
             try {
                 fidelityPoints = userClient.getUserById(userId).getFidelity();
+                logger.info("Usuario {} tiene {} puntos de fidelidad", userId, fidelityPoints);
             } catch (Exception e) {
+                logger.error("Usuario no encontrado: {}", userId);
                 throw new IllegalArgumentException("Usuario no encontrado: " + userId);
             }
 
             int fidelityDiscount = 0;
             try {
                 fidelityDiscount = fidelityDiscountClient.getBestDiscount(fidelityPoints);
+                logger.info("Descuento de fidelidad para usuario {}: {}%", userId, fidelityDiscount);
             } catch (Exception e) {
-                // Log o fallback
+                logger.warn("No se pudo obtener descuento de fidelidad para usuario {}. Detalle: {}", userId, e.getMessage());
             }
 
             // Elegir el mejor descuento
@@ -80,18 +92,23 @@ public class ReserveService {
             double discountedFee = reserve.getFee() * (1 - bestDiscount / 100.0);
             userFees.put(userId, discountedFee);
 
+            logger.info("Descuento aplicado para usuario {}: {}%. Fee final: {}", userId, bestDiscount, discountedFee);
+
             // Aumentar fidelidad
             try {
                 userClient.addFidelityPoint(userId);
-            } catch (Exception ignored) {}
+                logger.debug("Fidelidad aumentada para usuario {}", userId);
+            } catch (Exception e) {
+                logger.warn("No se pudo aumentar la fidelidad para usuario {}. Detalle: {}", userId, e.getMessage());
+            }
         }
 
-        // Guardar los fees individuales si tienes un campo userFees
         reserve.setUserFees(userFees);
+        logger.info("Reserva completada. Total usuarios: {}. Reserva lista para guardar.", userFees.size());
 
         return reserveRepository.save(reserve);
     }
-
+    
     // Actualizar una reserva
     public ReserveEntity updateReserve(ReserveEntity reserve) {
         if (reserve.getStartTime() != null && reserve.getTotalTime() > 0) {
