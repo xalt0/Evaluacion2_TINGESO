@@ -33,3 +33,7 @@ spring:
           uri: lb://ms-reserve
           predicates:
             - Path=/reserves/**
+        - id: ms-1
+          uri: lb://ms-1
+          predicates:
+            - Path=/plans/**

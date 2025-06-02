@@ -1,5 +1,6 @@
 package com.tingeso.ms_reserve.services;
 
+import com.tingeso.ms_reserve.clients.PlanClient;
 import com.tingeso.ms_reserve.clients.UserClient;
 import com.tingeso.ms_reserve.clients.KartClient;
 import com.tingeso.ms_reserve.entities.ReserveEntity;
@@ -23,6 +24,9 @@ public class ReserveService {
 
     @Autowired
     private KartClient kartClient;
+
+    @Autowired
+    private PlanClient planClient;
 
     // Listar reservas
     public List<ReserveEntity> getAllReserves() {
