@@ -5,9 +5,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "ms-2", url = "http://ms-2/group-discounts")
+@FeignClient(name = "ms-2")
 public interface GroupDiscountClient {
 
-    @GetMapping("/best/{groupSize}")
+    @GetMapping("/group-discounts/best/{groupSize}")
     Integer getBestDiscount(@PathVariable("groupSize") int groupSize);
 }

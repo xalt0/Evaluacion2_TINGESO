@@ -108,7 +108,7 @@ public class ReserveService {
 
         return reserveRepository.save(reserve);
     }
-    
+
     // Actualizar una reserva
     public ReserveEntity updateReserve(ReserveEntity reserve) {
         if (reserve.getStartTime() != null && reserve.getTotalTime() > 0) {
