@@ -1,15 +1,18 @@
 package com.tingeso.ms_reserve.services;
 
+import com.tingeso.ms_reserve.DTOs.ReserveRackDTO;
 import com.tingeso.ms_reserve.clients.*;
 import com.tingeso.ms_reserve.entities.ReserveEntity;
 import com.tingeso.ms_reserve.repositories.ReserveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,5 +146,14 @@ public class ReserveService {
                 throw new IllegalArgumentException("Kart ID no existe: " + kartId);
             }
         }
+    }
+
+    // Retorna información para generar rack.
+    public List<ReserveRackDTO> getReservesForRack(LocalDate startDate, LocalDate endDate) {
+        List<ReserveEntity> reserves = reserveRepository.findByScheduleDateBetween(startDate, endDate);
+
+        return reserves.stream()
+                .map(r -> new ReserveRackDTO(r.getId(), r.getScheduleDate(), r.getStartTime(), r.getEndTime()))
+                .collect(Collectors.toList());
     }
 }

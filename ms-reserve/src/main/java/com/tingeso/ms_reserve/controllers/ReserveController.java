@@ -1,11 +1,14 @@
 package com.tingeso.ms_reserve.controllers;
 
+import com.tingeso.ms_reserve.DTOs.ReserveRackDTO;
 import com.tingeso.ms_reserve.entities.ReserveEntity;
 import com.tingeso.ms_reserve.services.ReserveService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -54,5 +57,15 @@ public class ReserveController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/reserves/rack")
+    public List<ReserveRackDTO> getReservesForRack(
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        return reserveService.getReservesForRack(start, end);
     }
 }
