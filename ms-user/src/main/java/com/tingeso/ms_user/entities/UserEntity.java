@@ -3,6 +3,7 @@ package com.tingeso.ms_user.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -21,5 +22,5 @@ public class UserEntity {
     private String name;
     private String email;
     private int fidelity;
-    private Date birthdate;
+    private LocalDate birthdate;
 }
