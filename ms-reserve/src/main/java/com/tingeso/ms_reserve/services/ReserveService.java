@@ -103,7 +103,7 @@ public class ReserveService {
 
             // Preparar request para date-discount-service
             LocalDate birthday = null;
-            if (birthdayUserIds.contains(user.getId()) && user.getBirthdate() != null) {
+            if (user.getBirthdate() != null) {
                 birthday = user.getBirthdate()
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
@@ -144,8 +144,8 @@ public class ReserveService {
         reserve.setUserFees(userFees);
         return reserveRepository.save(reserve);
     }
-    //
 
+    //
     private List<Long> getEligibleBirthdayUserIds(List<UserDTO> users, LocalDate scheduleDate) {
         int size = users.size();
         int max = 0;
