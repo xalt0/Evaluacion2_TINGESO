@@ -1,18 +1,20 @@
 package com.tingeso.ms_reserve.services;
 
 import com.tingeso.ms_reserve.DTOs.ReserveRackDTO;
+import com.tingeso.ms_reserve.DTOs.UserDTO;
 import com.tingeso.ms_reserve.clients.*;
 import com.tingeso.ms_reserve.entities.ReserveEntity;
 import com.tingeso.ms_reserve.repositories.ReserveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.MonthDay;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,9 @@ public class ReserveService {
     @Autowired
     private FidelityDiscountClient fidelityDiscountClient;
 
+    @Autowired
+    private DateDiscountClient dateDiscountClient;
+
     private static final Logger logger = LoggerFactory.getLogger(ReserveService.class);
 
     // Listar reservas
@@ -54,62 +59,111 @@ public class ReserveService {
     public ReserveEntity saveReserve(ReserveEntity reserve) {
         logger.info("Guardando nueva reserva con usuarios: {}", reserve.getUserIds());
 
-        // Calcular endTime si corresponde
+        // Calcular endTime
         if (reserve.getStartTime() != null && reserve.getTotalTime() > 0) {
             reserve.setEndTime(reserve.getStartTime().plusMinutes(reserve.getTotalTime()));
             logger.debug("EndTime calculado: {}", reserve.getEndTime());
         }
 
-        // Obtener descuento grupal
         int groupSize = reserve.getUserIds().size();
         int groupDiscount = 0;
         try {
             groupDiscount = groupDiscountClient.getBestDiscount(groupSize);
             logger.info("Descuento grupal para {} personas: {}%", groupSize, groupDiscount);
         } catch (Exception e) {
-            logger.warn("No se pudo obtener descuento grupal. Usando 0%. Detalle: {}", e.getMessage());
+            logger.warn("No se pudo obtener descuento grupal. Detalle: {}", e.getMessage());
         }
 
-        Map<Long, Double> userFees = new HashMap<>();
-
+        // Obtener usuarios
+        List<UserDTO> users = new ArrayList<>();
         for (Long userId : reserve.getUserIds()) {
-            int fidelityPoints = 0;
             try {
-                fidelityPoints = userClient.getUserById(userId).getFidelity();
-                logger.info("Usuario {} tiene {} puntos de fidelidad", userId, fidelityPoints);
+                users.add(userClient.getUserById(userId));
             } catch (Exception e) {
                 logger.error("Usuario no encontrado: {}", userId);
                 throw new IllegalArgumentException("Usuario no encontrado: " + userId);
             }
+        }
 
+        // Cumpleaños elegibles
+        List<Long> birthdayUserIds = getEligibleBirthdayUserIds(users, reserve.getScheduleDate());
+
+        Map<Long, Double> userFees = new HashMap<>();
+
+        for (UserDTO user : users) {
+            int fidelityPoints = user.getFidelity();
             int fidelityDiscount = 0;
             try {
                 fidelityDiscount = fidelityDiscountClient.getBestDiscount(fidelityPoints);
-                logger.info("Descuento de fidelidad para usuario {}: {}%", userId, fidelityDiscount);
+                logger.info("Descuento fidelidad usuario {}: {}%", user.getId(), fidelityDiscount);
             } catch (Exception e) {
-                logger.warn("No se pudo obtener descuento de fidelidad para usuario {}. Detalle: {}", userId, e.getMessage());
+                logger.warn("No se pudo obtener descuento fidelidad para usuario {}. Detalle: {}", user.getId(), e.getMessage());
             }
 
-            // Elegir el mejor descuento
-            int bestDiscount = Math.max(groupDiscount, fidelityDiscount);
-            double discountedFee = reserve.getFee() * (1 - bestDiscount / 100.0);
-            userFees.put(userId, discountedFee);
+            // Preparar request para date-discount-service
+            LocalDate birthday = null;
+            if (birthdayUserIds.contains(user.getId()) && user.getBirthdate() != null) {
+                birthday = user.getBirthdate()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+            }
 
-            logger.info("Descuento aplicado para usuario {}: {}%. Fee final: {}", userId, bestDiscount, discountedFee);
-
-            // Aumentar fidelidad
+            double dateDiscount = 0.0;
             try {
-                userClient.addFidelityPoint(userId);
-                logger.debug("Fidelidad aumentada para usuario {}", userId);
+                dateDiscount = dateDiscountClient.getBestDateDiscount(reserve.getScheduleDate(), birthday);
+                logger.info("Descuento por fecha para usuario {}: {}%", user.getId(), dateDiscount * 100);
             } catch (Exception e) {
-                logger.warn("No se pudo aumentar la fidelidad para usuario {}. Detalle: {}", userId, e.getMessage());
+                logger.warn("No se pudo obtener descuento por fecha para usuario {}. Detalle: {}", user.getId(), e.getMessage());
+            }
+
+            // Calcular mejor descuento
+            double bestDiscount = Stream.of(
+                    fidelityDiscount / 100.0,
+                    groupDiscount / 100.0,
+                    dateDiscount
+            ).max(Double::compare).orElse(0.0);
+
+            double finalFee = reserve.getFee() * (1 - bestDiscount);
+            userFees.put(user.getId(), finalFee);
+            logger.info("Usuario {}: mejor descuento aplicado: {}%. Tarifa final: {}", user.getId(), bestDiscount * 100, finalFee);
+
+            try {
+                userClient.addFidelityPoint(user.getId());
+            } catch (Exception e) {
+                logger.warn("No se pudo aumentar fidelidad usuario {}. Detalle: {}", user.getId(), e.getMessage());
             }
         }
 
         reserve.setUserFees(userFees);
-        logger.info("Reserva completada. Total usuarios: {}. Reserva lista para guardar.", userFees.size());
-
         return reserveRepository.save(reserve);
+    }
+    //
+
+    private List<Long> getEligibleBirthdayUserIds(List<UserDTO> users, LocalDate scheduleDate) {
+        int size = users.size();
+        int max = 0;
+
+        if (size >= 3 && size <= 5) max = 1;
+        else if (size >= 6 && size <= 15) max = 2;
+
+        MonthDay target = MonthDay.from(scheduleDate);
+
+        return users.stream()
+                .filter(u -> u.getBirthdate() != null)
+                .filter(u -> {
+                    try {
+                        Instant instant = u.getBirthdate().toInstant();
+                        LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+                        MonthDay userBirth = MonthDay.from(localDate);
+                        return userBirth.equals(target);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .limit(max)
+                .map(UserDTO::getId)
+                .collect(Collectors.toList());
     }
 
     // Actualizar una reserva

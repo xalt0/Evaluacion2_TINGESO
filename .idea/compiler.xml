@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="config-server" />
+        <module name="gateway-server" />
+        <module name="eureka-server" />
+        <module name="ms-user" />
+      </profile>
+      <profile name="Annotation profile for ms-reserve" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="ms-2" />
+        <module name="ms-1" />
+        <module name="ms-6" />
+        <module name="ms-reserve" />
+        <module name="ms-4" />
+        <module name="ms-kart" />
+        <module name="ms-3" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="config-server" options="-parameters" />
+      <module name="eureka-server" options="-parameters" />
+      <module name="gateway-server" options="-parameters" />
+      <module name="ms-1" options="-parameters" />
+      <module name="ms-2" options="-parameters" />
+      <module name="ms-3" options="-parameters" />
+      <module name="ms-4" options="-parameters" />
+      <module name="ms-6" options="-parameters" />
+      <module name="ms-kart" options="-parameters" />
+      <module name="ms-reserve" options="-parameters" />
+      <module name="ms-user" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -45,3 +45,11 @@ spring:
           uri: lb://ms-3
           predicates:
             - Path=/fidelity-discounts/**
+        - id: ms-4
+          uri: lb://ms-4
+          predicates:
+            - Path=/date-discounts/**
+        - id: ms-6
+          uri: lb://ms-6
+          predicates:
+            - Path=/rack/**
