@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 // Jakarta Persistence API (Java): Sirve para mapear clases Java a tablas de bases de datos.
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -27,6 +28,6 @@ public class KartEntity {
 
     private String code; // Código. E.g.: K001
     private String model; // Modelo. E.g.: Sodikart RT8
-    private Date maintenance; // Fecha de próxima mantención. E.g.: 2025-10-24 (YYYY-MM-DD en PSQL)
+    private LocalDate maintenance; // Fecha de próxima mantención. E.g.: 2025-10-24 (YYYY-MM-DD en PSQL)
     private boolean available; // Disponibilidad. E.g.: true
 }
