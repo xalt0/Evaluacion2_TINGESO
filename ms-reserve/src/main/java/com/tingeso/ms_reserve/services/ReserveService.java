@@ -103,10 +103,9 @@ public class ReserveService {
 
             // Preparar request para date-discount-service
             LocalDate birthday = null;
-            if (user.getBirthdate() != null) {
-                birthday = user.getBirthdate()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
+            if (birthdayUserIds.contains(user.getId())) {
+                birthday = Instant.ofEpochMilli(user.getBirthdate().getTime())
+                        .atZone(ZoneId.of("UTC"))
                         .toLocalDate();
             }
 
@@ -145,13 +144,13 @@ public class ReserveService {
         return reserveRepository.save(reserve);
     }
 
-    //
+    // Filtro de usuarios aplicables al descuento por cumpleaños
     private List<Long> getEligibleBirthdayUserIds(List<UserDTO> users, LocalDate scheduleDate) {
         int size = users.size();
         int max = 0;
 
         if (size >= 3 && size <= 5) max = 1;
-        else if (size >= 6 && size <= 15) max = 2;
+        else if (size >= 6 && size <= 10) max = 2;
 
         MonthDay target = MonthDay.from(scheduleDate);
 
@@ -160,7 +159,7 @@ public class ReserveService {
                 .filter(u -> {
                     try {
                         Instant instant = u.getBirthdate().toInstant();
-                        LocalDate localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+                        LocalDate localDate = instant.atZone(ZoneId.of("UTC")).toLocalDate(); // CORREGIDO
                         MonthDay userBirth = MonthDay.from(localDate);
                         return userBirth.equals(target);
                     } catch (Exception e) {

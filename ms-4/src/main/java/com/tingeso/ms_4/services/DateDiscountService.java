@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.MonthDay;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -30,9 +31,18 @@ public class DateDiscountService {
         double weekend = (date.getDayOfWeek() == DayOfWeek.SATURDAY ||
                 date.getDayOfWeek() == DayOfWeek.SUNDAY) ? 0.10 : 0.0;
 
-        double birthday = (birthdate != null &&
-                date.getMonth() == birthdate.getMonth() &&
-                date.getDayOfMonth() == birthdate.getDayOfMonth()) ? 0.50 : 0.0;
+        double birthday = 0.0;
+        if (birthdate != null) {
+            MonthDay birth = MonthDay.from(birthdate);
+            MonthDay target = MonthDay.from(date);
+
+            System.out.println("Comparando birth: " + birth + " vs target: " + target);
+
+            if (birth.equals(target)) {
+                System.out.println("Cumpleaños detectado, aplicando 50% descuento");
+                birthday = 0.50;
+            }
+        }
 
         double bestDiscount = Stream.of(specialDate, weekend, birthday)
                 .max(Double::compare)
@@ -41,6 +51,8 @@ public class DateDiscountService {
         String discountType = bestDiscount == birthday ? "birthday" :
                 bestDiscount == specialDate ? "specialDate" :
                         bestDiscount == weekend ? "weekend" : "none";
+
+        System.out.println("   -> Mejor descuento aplicado: " + (bestDiscount * 100) + "% (" + discountType + ")");
 
         DateDiscountEntity discount = new DateDiscountEntity();
         discount.setScheduleDate(date);
