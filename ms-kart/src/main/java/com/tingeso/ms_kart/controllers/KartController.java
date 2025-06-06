@@ -22,7 +22,7 @@ public class KartController {
     KartService kartService;
 
     //listKarts
-    @GetMapping("/list/")
+    @GetMapping("/list")
     public ResponseEntity<List<KartEntity>> listKarts() {
         List<KartEntity> karts = kartService.getKarts();
         return new ResponseEntity<>(karts, HttpStatus.OK);
@@ -37,14 +37,14 @@ public class KartController {
     }
 
     //saveKart
-    @PostMapping("/save/")
+    @PostMapping("/save")
     public ResponseEntity<KartEntity> saveKart(@RequestBody KartEntity kart) {
         KartEntity kartNew = kartService.saveKart(kart);
         return new ResponseEntity<>(kartNew, HttpStatus.OK);
     }
 
     //updateKart
-    @PutMapping("/update/")
+    @PutMapping("/update")
     public ResponseEntity<KartEntity> updateKart(@RequestBody KartEntity kart) {
         KartEntity kartUpdated = kartService.updateKart(kart);
         return ResponseEntity.ok(kartUpdated);
@@ -58,7 +58,7 @@ public class KartController {
     }
 
     //getAvailableKarts
-    @GetMapping("/available/")
+    @GetMapping("/available")
     public ResponseEntity<List<KartEntity>> getAvailableKarts() {
         return ResponseEntity.ok(kartService.getAvailableKarts());
     }

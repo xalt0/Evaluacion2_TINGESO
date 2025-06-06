@@ -57,4 +57,3 @@ public class DateDiscountService {
         return dateDiscountRepository.findByScheduleDate(date);
     }
 }
-

@@ -12,14 +12,7 @@ import java.time.LocalDate;
 
 @FeignClient(name = "ms-4")
 public interface DateDiscountClient {
-
-    @PostMapping("/date-discounts/evaluate")
-    Double evaluateDateDiscount(@RequestBody DiscountDTO dto);
-
-    @GetMapping("/best-discount")
-    double getBestDateDiscount(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(value = "birthdate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthdate
-    );
+    @PostMapping("/date-discounts/check")
+    double getBestDateDiscount(@RequestBody DiscountDTO dto);
 }
+

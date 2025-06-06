@@ -1,5 +1,6 @@
 package com.tingeso.ms_reserve.services;
 
+import com.tingeso.ms_reserve.DTOs.DiscountDTO;
 import com.tingeso.ms_reserve.DTOs.ReserveRackDTO;
 import com.tingeso.ms_reserve.DTOs.UserDTO;
 import com.tingeso.ms_reserve.clients.*;
@@ -111,7 +112,12 @@ public class ReserveService {
 
             double dateDiscount = 0.0;
             try {
-                dateDiscount = dateDiscountClient.getBestDateDiscount(reserve.getScheduleDate(), birthday);
+                DiscountDTO dto = new DiscountDTO();
+                dto.setUserId(user.getId());
+                dto.setScheduleDate(reserve.getScheduleDate());
+                dto.setBirthdate(birthday);
+
+                dateDiscount = dateDiscountClient.getBestDateDiscount(dto);
                 logger.info("Descuento por fecha para usuario {}: {}%", user.getId(), dateDiscount * 100);
             } catch (Exception e) {
                 logger.warn("No se pudo obtener descuento por fecha para usuario {}. Detalle: {}", user.getId(), e.getMessage());
