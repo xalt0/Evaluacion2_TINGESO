@@ -20,13 +20,16 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: '*'
-            allowedMethods: "*"
-            allowedHeaders: "*"
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
 
       routes:
         - id: ms-user
-          uri: lb://ms-user
+          uri: lb://MS-USER
           predicates:
             - Path=/users/**
         - id: ms-kart
