@@ -1,7 +1,7 @@
 import httpClient from "../http-common";
 
 const getAll = () => {
-    return httpClient.get('/users/list/');
+    return httpClient.get('/users/list');
 }
 
 const create = data => {
@@ -13,7 +13,7 @@ const get = id => {
 }
 
 const update = data => {
-    return httpClient.put('/users/update/', data);
+    return httpClient.put('/users/update', data);
 }
 
 const remove = id => {
