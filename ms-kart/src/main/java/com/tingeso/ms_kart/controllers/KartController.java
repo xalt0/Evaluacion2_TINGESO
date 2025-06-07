@@ -12,11 +12,6 @@ import java.util.List;
 
 @RestController // Marca esta clase como un controlador que maneja solicitudes HTTP y devuelve respuestas JSON.
 @RequestMapping("/karts") // Definición de la ruta base para todas las solicitudes que maneja el controlador.
-/*
-Permite reconocer y aceptar las solicitudes de cualquier puerto.
-(Evita problemas de intercambio de recursos de origen cruzado).
-*/
-@CrossOrigin("*")
 public class KartController {
     @Autowired
     KartService kartService;

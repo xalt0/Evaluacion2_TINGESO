@@ -79,87 +79,89 @@ const AddEditUser = () => {
 
   return (
     <Box
+      component="form"
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      component="form"
+      onSubmit={saveUser}
     >
       <h3> {userForm} </h3>
       <hr />
-      <form>
-        <FormControl fullWidth>
-          <TextField
-            id="rut"
-            label="Rut"
-            value={rut}
-            variant="standard"
-            onChange={(e) => setRut(e.target.value)}
-            helperText="Ej. 12.587.698-8"
+
+      <FormControl fullWidth>
+        <TextField
+          id="rut"
+          label="Rut"
+          value={rut}
+          variant="standard"
+          onChange={(e) => setRut(e.target.value)}
+          helperText="Ej. 12.587.698-8"
+        />
+      </FormControl>
+
+      <FormControl fullWidth>
+        <TextField
+          id="name"
+          label="Name"
+          value={name}
+          variant="standard"
+          onChange={(e) => setName(e.target.value)}
+        />
+      </FormControl>
+
+      <FormControl fullWidth>
+        <TextField
+          id="email"
+          label="Correo electrónico"
+          type="email"
+          value={email}
+          variant="standard"
+          onChange={(e) => setEmail(e.target.value)}
+          helperText="Ej. nombre@correo.com"
+        />
+      </FormControl>
+
+      <FormControl fullWidth>
+        <TextField
+          id="fidelity"
+          label="Fidelity"
+          type="number"
+          value={fidelity}
+          variant="standard"
+          onChange={(e) => setFidelity(e.target.value)}
+          helperText="Cantidad de veces que ha venido a KartingRM."
+        />
+      </FormControl>
+
+      <FormControl fullWidth>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+          <DatePicker
+            label="Birthdate."
+            value={birthdate}
+            onChange={(newValue) => setBirthdate(newValue)}
+            renderInput={(params) => <TextField {...params} variant="standard" />}
           />
-        </FormControl>
+        </LocalizationProvider>
+      </FormControl>
 
-        <FormControl fullWidth>
-          <TextField
-            id="name"
-            label="Name"
-            value={name}
-            variant="standard"
-            onChange={(e) => setName(e.target.value)}
-          />
-        </FormControl>
+      <FormControl>
+        <br />
+        <Button
+          variant="contained"
+          color="info"
+          type="submit"
+          style={{ marginLeft: "0.5rem" }}
+          startIcon={<SaveIcon />}
+        >
+          Guardar
+        </Button>
+      </FormControl>
 
-        <FormControl fullWidth>
-          <TextField
-            id="email"
-            label="Correo electrónico"
-            type="email"
-            value={email}
-            variant="standard"
-            onChange={(e) => setEmail(e.target.value)}
-            helperText="Ej. nombre@correo.com"
-          />
-        </FormControl>
-
-        <FormControl fullWidth>
-          <TextField
-            id="fidelity"
-            label="Fidelity"
-            type="number"
-            value={fidelity}
-            variant="standard"
-            onChange={(e) => setFidelity(e.target.value)}
-            helperText="Cantidad de veces que ha venido a KartingRM."
-          />
-        </FormControl>
-
-        <FormControl fullWidth>
-            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-              <DatePicker
-                label="Birthdate."
-                value={birthdate}
-                onChange={(newValue) => setBirthdate(newValue)}
-                renderInput={(params) => <TextField {...params} variant="standard" />}
-              />
-            </LocalizationProvider>
-          </FormControl>
-
-        <FormControl>
-          <br />
-          <Button
-            variant="contained"
-            color="info"
-            onClick={(e) => saveUser(e)}
-            style={{ marginLeft: "0.5rem" }}
-            startIcon={<SaveIcon />}
-          >
-            Guardar
-          </Button>
-        </FormControl>
-      </form>
       <hr />
       <Link to="/users/list">Back to List</Link>
     </Box>
+
   );
 };
 

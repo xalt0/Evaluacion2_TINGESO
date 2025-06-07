@@ -27,8 +27,8 @@ spring:
               - "*"
 
       routes:
-        - id: ms-user
-          uri: lb://MS-USER
+        - id: MS-USER
+          uri: lb://ms-user
           predicates:
             - Path=/users/**
         - id: ms-kart

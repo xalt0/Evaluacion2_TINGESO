@@ -5,7 +5,7 @@ const getAll = () => {
 }
 
 const create = data => {
-    return httpClient.post("/users/save/", data);
+    return httpClient.post("/users/save", data);
 }
 
 const get = id => {

@@ -2,7 +2,7 @@ import httpClient from "../http-common";
 
 // listReserve
 const getAll = () => {
-    return httpClient.get("/reserves/list/");
+    return httpClient.get("/reserves/list");
 }
 
 // getReserve
@@ -12,12 +12,12 @@ const get = id => {
 
 // saveReserve
 const create = data => {
-    return httpClient.post("/reserves/save/", data);
+    return httpClient.post("/reserves/save", data);
 }
 
 // updateReserve
 const update = data => {
-    return httpClient.put('/reserves/update/', data);
+    return httpClient.put('/reserves/update', data);
 }
 
 // deleteReserve
@@ -34,4 +34,5 @@ const rack = (startDate, endDate) => {
         }
     });
 };
+
 export default {getAll, get, create, update, remove, rack};
