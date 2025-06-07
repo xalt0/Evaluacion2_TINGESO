@@ -13,10 +13,9 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: false
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-
       globalcors:
         cors-configurations:
           '[/**]':
@@ -60,3 +59,7 @@ spring:
           uri: lb://ms-6
           predicates:
             - Path=/rack/**
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
