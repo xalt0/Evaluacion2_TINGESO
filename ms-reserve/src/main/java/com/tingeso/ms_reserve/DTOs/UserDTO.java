@@ -16,4 +16,5 @@ public class UserDTO {
     private String email;
     private int fidelity;
     private Date birthdate;
+    private Double finalFee;
 }

@@ -1,6 +1,7 @@
 package com.tingeso.ms_reserve.controllers;
 
 import com.tingeso.ms_reserve.DTOs.ReserveRackDTO;
+import com.tingeso.ms_reserve.DTOs.ReserveResponseDTO;
 import com.tingeso.ms_reserve.entities.ReserveEntity;
 import com.tingeso.ms_reserve.services.ReserveService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,12 @@ public class ReserveController {
 
     // Listar todas las reservas
     @GetMapping("/list")
-    public List<ReserveEntity> getAllReserves() {
-        return reserveService.getAllReserves();
+    public List<ReserveResponseDTO> getAllReserveResponses() {
+        return reserveService.getAllReserveResponses();
     }
 
     // Obtener reserva por ID
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<ReserveEntity> getReserveById(@PathVariable Long id) {
         return reserveService.getReserveById(id)
                 .map(ResponseEntity::ok)
@@ -58,7 +59,7 @@ public class ReserveController {
         }
     }
 
-    @GetMapping("/reserves/rack")
+    @GetMapping("/rack")
     public List<ReserveRackDTO> getReservesForRack(
             @RequestParam String startDate,
             @RequestParam String endDate

@@ -90,7 +90,11 @@ const ReserveList = () => {
               </TableCell>
               <TableCell align="center">{reserve.loops}</TableCell>
               <TableCell align="center">
-                {reserve.users?.map((user) => user.name || user.rut || user.id).join(", ")}
+                {reserve.users?.map((user) => (
+                  <div key={user.id}>
+                    {user.name} — <strong>${user.finalFee?.toFixed(0) ?? '-'}</strong>
+                  </div>
+                ))}
               </TableCell>
               <TableCell align="center">
                 {reserve.karts?.map((kart) => kart.code || kart.id).join(", ")}

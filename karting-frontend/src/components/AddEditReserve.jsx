@@ -49,8 +49,10 @@ const AddEditReserve = () => {
         const res = await reserveService.get(id);
         const data = res.data;
   
-        setSelectedUsers(data.users.map((u) => u.id));
-        setSelectedKarts(data.karts.map((k) => k.id));
+        setSelectedUsers(data.userIds || []);
+        setSelectedKarts(data.kartIds || []);
+
+
         setLoops(data.loops);
         setTrackTime(data.trackTime);
         setTotalTime(data.totalTime);
@@ -115,32 +117,37 @@ const AddEditReserve = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const reserve = {
-      id,
-      users: selectedUsers.map((id) => ({ id })),
-      karts: selectedKarts.map((id) => ({ id })),
+    const payload = {
+      userIds: selectedUsers,
+      kartIds: selectedKarts,
+      planId: plans.find((p) => p.name === selectedPlan)?.id || null,
       loops,
       trackTime,
       totalTime,
       fee,
-      scheduleDate: scheduleDate?.toISOString().split("T")[0],
+      scheduleDate: scheduleDate?.toISOString().split("T")[0], // "YYYY-MM-DD"
       startTime: startTime?.toTimeString().slice(0, 5), // "HH:mm"
-      endTime: endTime?.toTimeString().slice(0, 5),
+      endTime: endTime?.toTimeString().slice(0, 5),     // "HH:mm"
     };
 
-    const action = id ? reserveService.update : reserveService.create;
+    try {
+      console.log("Payload a enviar:", payload); // 👈 Agrega este log aquí
 
-    action(reserve)
-      .then(() => {
-        console.log("Reserva guardada exitosamente.");
-        navigate("/reserves/list");
-      })
-      .catch((error) => {
-        console.error("Error al guardar reserva:", error);
-      });
+      if (id) {
+        await reserveService.update(payload); // PUT /reserves/update
+      } else {
+        await reserveService.create(payload); // POST /reserves/save
+      }
+
+      alert("Reserva guardada con éxito");
+      navigate("/reserves/list");
+    } catch (error) {
+      console.error("Error al guardar reserva:", error);
+      alert("Error al guardar la reserva.");
+    }
   };
 
   return (

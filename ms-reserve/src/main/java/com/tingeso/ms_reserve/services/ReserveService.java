@@ -1,8 +1,7 @@
 package com.tingeso.ms_reserve.services;
 
-import com.tingeso.ms_reserve.DTOs.DiscountDTO;
+import com.tingeso.ms_reserve.DTOs.*;
 import com.tingeso.ms_reserve.DTOs.ReserveRackDTO;
-import com.tingeso.ms_reserve.DTOs.UserDTO;
 import com.tingeso.ms_reserve.clients.*;
 import com.tingeso.ms_reserve.entities.ReserveEntity;
 import com.tingeso.ms_reserve.repositories.ReserveRepository;
@@ -19,7 +18,6 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import feign.FeignException;
 
@@ -59,6 +57,11 @@ public class ReserveService {
     // Guardar una nueva reserva
     public ReserveEntity saveReserve(ReserveEntity reserve) {
         logger.info("Guardando nueva reserva con usuarios: {}", reserve.getUserIds());
+
+        // Validar que la lista de usuarios no sea null ni vacía
+        if (reserve.getUserIds() == null || reserve.getUserIds().isEmpty()) {
+            throw new IllegalArgumentException("La reserva debe contener al menos un usuario.");
+        }
 
         // Calcular endTime
         if (reserve.getStartTime() != null && reserve.getTotalTime() > 0) {
@@ -144,6 +147,7 @@ public class ReserveService {
         return reserveRepository.save(reserve);
     }
 
+
     // Filtro de usuarios aplicables al descuento por cumpleaños
     private List<Long> getEligibleBirthdayUserIds(List<UserDTO> users, LocalDate scheduleDate) {
         int size = users.size();
@@ -215,4 +219,50 @@ public class ReserveService {
                 .map(r -> new ReserveRackDTO(r.getId(), r.getScheduleDate(), r.getStartTime(), r.getEndTime()))
                 .collect(Collectors.toList());
     }
+
+    // Retorna información con usuarios y karts para endpoint list.
+    public List<ReserveResponseDTO> getAllReserveResponses() {
+        List<ReserveEntity> reserves = reserveRepository.findAll();
+
+        return reserves.stream().map(reserve -> {
+            ReserveResponseDTO dto = new ReserveResponseDTO();
+            dto.setId(reserve.getId());
+            dto.setLoops(reserve.getLoops());
+            dto.setTrackTime(reserve.getTrackTime());
+            dto.setTotalTime(reserve.getTotalTime());
+            dto.setFee(reserve.getFee());
+            dto.setScheduleDate(reserve.getScheduleDate());
+            dto.setStartTime(reserve.getStartTime());
+            dto.setEndTime(reserve.getEndTime());
+            dto.setUserFees(reserve.getUserFees());
+
+            // Obtener usuarios
+            List<UserDTO> users = reserve.getUserIds().stream().map(userId -> {
+                try {
+                    UserDTO user = userClient.getUserById(userId);
+                    Double fee = reserve.getUserFees().get(userId);
+                    user.setFinalFee(fee); // <-- Asignar el fee individual
+                    return user;
+                } catch (Exception e) {
+                    logger.warn("No se pudo obtener usuario {}: {}", userId, e.getMessage());
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            dto.setUsers(users);
+
+            // Obtener karts
+            List<KartDTO> karts = reserve.getKartIds().stream().map(kartId -> {
+                try {
+                    return kartClient.getKartById(kartId);
+                } catch (Exception e) {
+                    logger.warn("No se pudo obtener kart {}: {}", kartId, e.getMessage());
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            dto.setKarts(karts);
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }
