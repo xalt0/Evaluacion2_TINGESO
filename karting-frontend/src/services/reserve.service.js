@@ -35,4 +35,9 @@ const rack = (startDate, endDate) => {
     });
 };
 
-export default {getAll, get, create, update, remove, rack};
+// edit
+const edit = id => {
+    return httpClient.get(`/reserves/detailed/${id}`);
+}
+
+export default {getAll, get, create, update, remove, rack, edit};

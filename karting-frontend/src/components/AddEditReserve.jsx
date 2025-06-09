@@ -46,13 +46,12 @@ const AddEditReserve = () => {
     const fetchData = async () => {
       if (id) {
         setFormTitle("Editar Reserva");
+
         const res = await reserveService.get(id);
         const data = res.data;
-  
+
         setSelectedUsers(data.userIds || []);
         setSelectedKarts(data.kartIds || []);
-
-
         setLoops(data.loops);
         setTrackTime(data.trackTime);
         setTotalTime(data.totalTime);
@@ -60,39 +59,35 @@ const AddEditReserve = () => {
         setScheduleDate(new Date(data.scheduleDate));
         setStartTime(new Date(`1970-01-01T${data.startTime}`));
         setEndTime(new Date(`1970-01-01T${data.endTime}`));
-  
-        // Obtener Karts disponibles + asignados a esta Reserve.
-        const [availableRes, assignedKarts] = await Promise.all([
-          kartService.getAvailable(),
-          Promise.resolve(data.karts),
-        ]);
-  
+        setSelectedPlan(data.plan?.name || "");
+
+        const availableRes = await kartService.getAvailable();
         const availableKarts = availableRes.data;
+        const assignedKarts = data.karts || [];
+
         const mergedKarts = [
           ...availableKarts,
           ...assignedKarts.filter(
             (ak) => !availableKarts.some((k) => k.id === ak.id)
           ),
         ];
-  
+
         setKarts(mergedKarts);
       } else {
         setFormTitle("Nueva Reserva");
-  
-        // Solo mostrar karts disponibles
         const availableRes = await kartService.getAvailable();
         setKarts(availableRes.data);
       }
-  
+
       const [userRes, planRes] = await Promise.all([
         userService.getAll(),
         planService.getAll(),
       ]);
-  
+
       setUsers(userRes.data);
       setPlans(planRes.data);
     };
-  
+
     fetchData();
   }, [id]);
   

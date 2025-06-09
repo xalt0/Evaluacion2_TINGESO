@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import reserveService from "../services/reserve.service"; // Asegúrate de tener este servicio
+import reserveService from "../services/reserve.service";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -12,6 +12,11 @@ import Button from "@mui/material/Button";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+function localDateFromString(dateString) {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day, 12, 0, 0);
+}
 
 const ReserveList = () => {
   const [reserves, setReserves] = useState([]);
@@ -80,7 +85,9 @@ const ReserveList = () => {
           {reserves.map((reserve) => (
             <TableRow key={reserve.id}>
               <TableCell align="center">
-                {new Date(reserve.scheduleDate).toLocaleDateString("es-CL")}
+                {reserve.scheduleDate 
+                  ? localDateFromString(reserve.scheduleDate).toLocaleDateString("es-CL") 
+                  : '-'}
               </TableCell>
               <TableCell align="center">
                 {reserve.startTime?.slice(0, 5)}

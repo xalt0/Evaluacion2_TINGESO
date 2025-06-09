@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/reserves")
@@ -59,6 +60,7 @@ public class ReserveController {
         }
     }
 
+    // Endpoint para retornar información al rack
     @GetMapping("/rack")
     public List<ReserveRackDTO> getReservesForRack(
             @RequestParam String startDate,
@@ -67,5 +69,16 @@ public class ReserveController {
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
         return reserveService.getReservesForRack(start, end);
+    }
+
+    // Endpoint para llevar información al frontend
+    @GetMapping("/detailed/{id}")
+    public ResponseEntity<ReserveResponseDTO> getDetailedReserve(@PathVariable Long id) {
+        Optional<ReserveEntity> reserveOpt = reserveService.getReserveById(id);
+        if (reserveOpt.isEmpty()) return ResponseEntity.notFound().build();
+
+        ReserveEntity reserve = reserveOpt.get();
+        ReserveResponseDTO dto = reserveService.convertToDetailedDTO(reserve);
+        return ResponseEntity.ok(dto);
     }
 }

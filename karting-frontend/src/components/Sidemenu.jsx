@@ -5,6 +5,8 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItemButton from "@mui/material/ListItemButton";
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
@@ -60,54 +62,16 @@ export default function Sidemenu({ open, toggleDrawer }) {
 
         <ListItemButton onClick={() => navigate("/rack")}>
           <ListItemIcon>
-            <AnalyticsIcon />
+            <CalendarTodayIcon />
           </ListItemIcon>
-          <ListItemText primary="Rack" />
+          <ListItemText primary="Rack Semanal" />
         </ListItemButton>
 
         <ListItemButton onClick={() => navigate("/extraHours/list")}>
           <ListItemIcon>
-            <MoreTimeIcon />
+            <TableChartIcon />
           </ListItemIcon>
-          <ListItemText primary="Horas Extra" />
-        </ListItemButton>
-
-        <ListItemButton onClick={() => navigate("/paycheck/list")}>
-          <ListItemIcon>
-            <PaidIcon />
-          </ListItemIcon>
-          <ListItemText primary="Planilla Sueldos" />
-        </ListItemButton>
-
-        <ListItemButton onClick={() => navigate("/paycheck/calculate")}>
-          <ListItemIcon>
-            <CalculateIcon />
-          </ListItemIcon>
-          <ListItemText primary="Calcular Planilla" />
-        </ListItemButton>
-
-      </List>
-
-      <Divider />
-
-      <List>
-        <ListItemButton onClick={() => navigate("/employee/discounts")}>
-          <ListItemIcon>
-            <DiscountIcon />
-          </ListItemIcon>
-          <ListItemText primary="Descuentos" />
-        </ListItemButton>
-        <ListItemButton onClick={() => navigate("/paycheck/vacations")}>
-          <ListItemIcon>
-            <HailIcon />
-          </ListItemIcon>
-          <ListItemText primary="Vacaciones" />
-        </ListItemButton>
-        <ListItemButton onClick={() => navigate("/paycheck/medicalleave")}>
-          <ListItemIcon>
-            <MedicationLiquidIcon />
-          </ListItemIcon>
-          <ListItemText primary="Licencias Medicas" />
+          <ListItemText primary="Reportes de Ingresos" />
         </ListItemButton>
       </List>
     </Box>

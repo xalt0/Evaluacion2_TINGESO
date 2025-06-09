@@ -265,4 +265,43 @@ public class ReserveService {
         }).collect(Collectors.toList());
     }
 
+    // Conversor a DTO detallado.
+    public ReserveResponseDTO convertToDetailedDTO(ReserveEntity reserve) {
+        ReserveResponseDTO dto = new ReserveResponseDTO();
+        dto.setId(reserve.getId());
+        dto.setLoops(reserve.getLoops());
+        dto.setTrackTime(reserve.getTrackTime());
+        dto.setTotalTime(reserve.getTotalTime());
+        dto.setFee(reserve.getFee());
+        dto.setScheduleDate(reserve.getScheduleDate());
+        dto.setStartTime(reserve.getStartTime());
+        dto.setEndTime(reserve.getEndTime());
+        dto.setUserFees(reserve.getUserFees());
+
+        List<UserDTO> users = reserve.getUserIds().stream().map(userId -> {
+            try {
+                UserDTO user = userClient.getUserById(userId);
+                Double fee = reserve.getUserFees().get(userId);
+                user.setFinalFee(fee);
+                return user;
+            } catch (Exception e) {
+                logger.warn("No se pudo obtener usuario {}: {}", userId, e.getMessage());
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        dto.setUsers(users);
+
+        List<KartDTO> karts = reserve.getKartIds().stream().map(kartId -> {
+            try {
+                return kartClient.getKartById(kartId);
+            } catch (Exception e) {
+                logger.warn("No se pudo obtener kart {}: {}", kartId, e.getMessage());
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        dto.setKarts(karts);
+
+        return dto;
+    }
+
 }
