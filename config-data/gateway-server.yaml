@@ -24,7 +24,7 @@ spring:
             allowedHeaders: "*"
 
       routes:
-        - id: MS-USER
+        - id: ms-user
           uri: lb://ms-user
           predicates:
             - Path=/users/**
