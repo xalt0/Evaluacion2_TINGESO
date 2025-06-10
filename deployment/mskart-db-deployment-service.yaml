@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mskart-db-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/mskart-db-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mskart-db-pvc
+  labels:
+    app: postgres
+    tier: database
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mskart-db-deployment
+  labels:
+    app: mskart-db-deployment
+    tier: database
+spec:
+  selector:
+    matchLabels:
+      app: mskart-db-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mskart-db-deployment
+        tier: database
+    spec:
+      containers:
+        - name: mskart-db
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_PASSWORD
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: mskart-db-data
+      volumes:
+        - name: mskart-db-data
+          persistentVolumeClaim:
+            claimName: mskart-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mskart-db-service
+  labels:
+    app: mskart-db-service
+    tier: database
+spec:
+  ports:
+    - port: 5438
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: mskart-db-deployment
+    tier: database
+  type: LoadBalancer

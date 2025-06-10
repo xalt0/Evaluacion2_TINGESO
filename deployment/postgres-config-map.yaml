@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config-map
+  labels:
+    app: postgres-config-map
+data:
+  DB_HOST_MS1: ms1-db-service
+  DB_PORT_MS1: "5432"
+  DB_DBNAME_MS1: ms1-db
+  DB_HOST_MS2: ms2-db-service
+  DB_PORT_MS2: "5433"
+  DB_DBNAME_MS2: ms2-db
+  DB_HOST_MS3: ms3-db-service
+  DB_PORT_MS3: "5434"
+  DB_DBNAME_MS3: ms3-db
+  DB_HOST_MS4: ms4-db-service
+  DB_PORT_MS4: "5435"
+  DB_DBNAME_MS4: ms4-db
+  DB_HOST_MS6: ms6-db-service
+  DB_PORT_MS6: "5437"
+  DB_DBNAME_MS6: ms6-db
+  DB_HOST_MSKART: mskart-db-service
+  DB_PORT_MSKART: "5438"
+  DB_DBNAME_MSKART: mskart-db
+  DB_HOST_MSRESERVE: msreserve-db-service
+  DB_PORT_MSRESERVE: "5436"
+  DB_DBNAME_MSRESERVE: msreserve-db
+  DB_HOST_MSUSER: msuser-db-service
+  DB_PORT_MSUSER: "5439"
+  DB_DBNAME_MSUSER: msuser-db

@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: msreserve-db-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/msreserve-db-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: msreserve-db-pvc
+  labels:
+    app: postgres
+    tier: database
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msreserve-db-deployment
+  labels:
+    app: msreserve-db-deployment
+    tier: database
+spec:
+  selector:
+    matchLabels:
+      app: msreserve-db-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: msreserve-db-deployment
+        tier: database
+    spec:
+      containers:
+        - name: msreserve-db
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_PASSWORD
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: msreserve-db-data
+      volumes:
+        - name: msreserve-db-data
+          persistentVolumeClaim:
+            claimName: msreserve-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: msreserve-db-service
+  labels:
+    app: msreserve-db-service
+    tier: database
+spec:
+  ports:
+    - port: 5436
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: msreserve-db-deployment
+    tier: database
+  type: LoadBalancer

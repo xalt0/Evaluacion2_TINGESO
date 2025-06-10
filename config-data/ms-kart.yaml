@@ -1,12 +1,10 @@
 server:
-  port: ${SERVER_PORT:8082}
-
+  port: ${SERVER_PORT}
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DBNAME:karts}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
-
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DBNAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 eureka:
   instance:
     preferIpAddress: true
@@ -14,4 +12,4 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server-service:8761/eureka/
